@@ -1,0 +1,248 @@
+import 'package:flutter/material.dart';
+
+// Enum to manage the state of the transaction type selector
+enum TransactionType { income, expense }
+
+class AddTransactionScreen extends StatefulWidget {
+  const AddTransactionScreen({super.key});
+
+  @override
+  State<AddTransactionScreen> createState() => _AddTransactionScreenState();
+}
+
+class _AddTransactionScreenState extends State<AddTransactionScreen> {
+  // State variables for the form
+  TransactionType _selectedType = TransactionType.expense;
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  String? _selectedCategory;
+  DateTime? _selectedDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        backgroundColor: Colors.grey[100],
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.black),
+          onPressed: () {
+            // Handle close action
+          },
+        ),
+        title: const Text(
+          'Add Transaction',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildTransactionTypeSelector(),
+              const SizedBox(height: 24),
+              _buildTextField(controller: _amountController, hint: 'Amount'),
+              const SizedBox(height: 16),
+              _buildCategorySelector(),
+              const SizedBox(height: 16),
+              _buildDateField(),
+              const SizedBox(height: 16),
+              _buildTextField(
+                controller: _descriptionController,
+                hint: 'Description (optional)',
+                maxLines: 4,
+              ),
+              const SizedBox(height: 40),
+              _buildSaveButton(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Custom widget for the Income/Expense selector
+  Widget _buildTransactionTypeSelector() {
+    return Container(
+      padding: const EdgeInsets.all(4.0),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Row(
+        children: [
+          Expanded(child: _buildTypeButton('Income', TransactionType.income)),
+          Expanded(child: _buildTypeButton('Expense', TransactionType.expense)),
+        ],
+      ),
+    );
+  }
+
+  // Helper for the selector buttons
+  Widget _buildTypeButton(String title, TransactionType type) {
+    bool isSelected = _selectedType == type;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedType = type;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(10.0),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : [],
+        ),
+        child: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: Colors.black,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Reusable text field widget
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    int maxLines = 1,
+  }) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(color: Colors.grey[500]),
+        filled: true,
+        fillColor: Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 16.0,
+        ),
+      ),
+    );
+  }
+
+  // A tappable field that looks like a text field for category selection
+  Widget _buildCategorySelector() {
+    return InkWell(
+      onTap: () {
+        // Show a dialog or bottom sheet for category selection
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              _selectedCategory ?? 'Category',
+              style: TextStyle(
+                color: _selectedCategory == null
+                    ? Colors.grey[500]
+                    : Colors.black,
+                fontSize: 16,
+              ),
+            ),
+            Icon(Icons.unfold_more, color: Colors.grey[600]),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // A read-only text field that shows a date picker on tap
+  Widget _buildDateField() {
+    return TextField(
+      controller: _dateController,
+      readOnly: true,
+      decoration: InputDecoration(
+        hintText: 'Date',
+        hintStyle: TextStyle(color: Colors.grey[500]),
+        filled: true,
+        fillColor: Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 16.0,
+        ),
+      ),
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+          context: context,
+          initialDate: _selectedDate ?? DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2101),
+        );
+        if (pickedDate != null) {
+          setState(() {
+            _selectedDate = pickedDate;
+            _dateController.text = "${pickedDate.toLocal()}".split(
+              ' ',
+            )[0]; // Format as YYYY-MM-DD
+          });
+        }
+      },
+    );
+  }
+
+  // The final save button at the bottom of the screen
+  Widget _buildSaveButton() {
+    return ElevatedButton(
+      onPressed: () {
+        // Handle save action
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF007BFF),
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        elevation: 0,
+      ),
+      child: const Text(
+        'Save',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}
