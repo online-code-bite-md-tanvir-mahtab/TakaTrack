@@ -40,6 +40,7 @@ class SavingsGoalsScreen extends StatelessWidget {
             // Use Expanded to make the list scrollable and push the button to the bottom
             Expanded(
               child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 children: const [
                   _GoalItem(
                     icon: Icons.laptop_mac,

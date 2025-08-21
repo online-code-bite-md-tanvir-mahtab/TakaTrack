@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:takatrack/model/add_transaction.dart';
 
 // Enum to manage the state of the transaction type selector
 enum TransactionType { income, expense }
@@ -18,6 +20,15 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   String? _selectedCategory;
   DateTime? _selectedDate;
+
+  late final Box<AddTransaction> addTransactionDatabase; // Placeholder for database instance
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    addTransactionDatabase = Hive.box<AddTransaction>(''); // Initialize your database here
+  }
 
   @override
   Widget build(BuildContext context) {
