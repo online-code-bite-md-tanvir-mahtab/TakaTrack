@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 part 'add_transaction.g.dart';
 
 @HiveType(typeId: 0)
@@ -25,12 +26,14 @@ class AddTransaction extends HiveObject {
   late String status; // Added status field
 
   AddTransaction({
-    required this.id,
+    String? id,
     required this.amount,
     required this.category,
     required this.date,
     required this.note,
     required this.isIncome,
     required this.status, // Added status to constructor
-  });
+  }) {
+    this.id = id ?? Uuid().v4();
+  }
 }

@@ -1,6 +1,11 @@
+// import 'dart:nativewrappers/_internal/vm/lib/ffi_native_type_patch.dart';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:takatrack/model/add_transaction.dart';
+import 'package:takatrack/service/transaction_service.dart';
+import 'package:takatrack/utils/util.dart';
+// import 'dart:nativewrappers/_internal/vm/lib/ffi_native_type_patch.dart';
 
 // Enum to manage the state of the transaction type selector
 enum TransactionType { income, expense }
@@ -21,13 +26,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   String? _selectedCategory;
   DateTime? _selectedDate;
 
-  late final Box<AddTransaction> addTransactionDatabase; // Placeholder for database instance
+  Util util = Util();
+  final service = TransactionService();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    addTransactionDatabase = Hive.box<AddTransaction>(''); // Initialize your database here
   }
 
   @override
@@ -163,11 +168,37 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 
+  void _showCategorySelector() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: util.categories.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(util.categories[index]),
+              onTap: () {
+                setState(() {
+                  _selectedCategory = util.categories[index];
+                });
+                Navigator.pop(context);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
   // A tappable field that looks like a text field for category selection
   Widget _buildCategorySelector() {
     return InkWell(
       onTap: () {
-        // Show a dialog or bottom sheet for category selection
+        _showCategorySelector();
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
@@ -179,7 +210,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              _selectedCategory ?? 'Category',
+              _selectedCategory ?? 'Select Category',
               style: TextStyle(
                 color: _selectedCategory == null
                     ? Colors.grey[500]
@@ -237,6 +268,22 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     return ElevatedButton(
       onPressed: () {
         // Handle save action
+        setState(() {
+          service.addTransaction(
+            AddTransaction(
+              amount: double.parse(_amountController.text),
+              category: _selectedCategory.toString(),
+              date: DateTime(
+                int.parse(_dateController.text.split("-")[0]),
+                int.parse(_dateController.text.split("-")[1]),
+                int.parse(_dateController.text.split("-")[2]),
+              ),
+              note: _descriptionController.text,
+              isIncome: _selectedType == TransactionType.income ? true : false,
+              status: _selectedType.name,
+            ),
+          );
+        });
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF007BFF),
