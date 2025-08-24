@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:takatrack/model/add_transaction.dart';
+import 'package:takatrack/model/transaction.dart';
+import 'package:takatrack/screen/transaction_screen.dart';
 import 'package:takatrack/service/transaction_service.dart';
 import 'package:takatrack/utils/util.dart';
 // import 'dart:nativewrappers/_internal/vm/lib/ffi_native_type_patch.dart';
@@ -46,6 +48,26 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           icon: const Icon(Icons.close, color: Colors.black),
           onPressed: () {
             // Handle close action
+            List<AddTransaction> trans = service.getAllTransactions();
+            List<Transaction> transactions = [];
+            // now looping to the trans
+            for (var element in trans) {
+              var icon = getCategoryIcon(element.category);
+              var category = element.category;
+              var date =
+                  "${element.date.year}-${element.date.month}-${element.date.day}";
+              var amount = element.amount;
+              transactions.add(
+                Transaction(
+                  icon: icon,
+                  category: category,
+                  date: date,
+                  amount: amount,
+                ),
+              );
+            }
+            print(transactions.length);
+            Navigator.pop(context);
           },
         ),
         title: const Text(
@@ -263,6 +285,51 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 
+  IconData getCategoryIcon(String category) {
+    switch (category) {
+      case 'Groceries':
+        return Icons.shopping_cart_outlined;
+      case 'Salary':
+        return Icons.attach_money;
+      case 'Rent':
+        return Icons.home_outlined;
+      case 'Dining Out':
+        return Icons.restaurant_outlined;
+      case 'Utilities':
+        return Icons.lightbulb_outline;
+      case 'Transportation':
+        return Icons.directions_bus_outlined;
+      case 'Entertainment':
+        return Icons.movie_outlined;
+      case 'Shopping':
+        return Icons.shopping_bag_outlined;
+      case 'Bonus':
+        return Icons.card_giftcard;
+      case 'Insurance':
+        return Icons.shield_outlined;
+      case 'Loan Payments':
+        return Icons.payment_outlined;
+      case 'Investments':
+        return Icons.show_chart;
+      case 'Education':
+        return Icons.school_outlined;
+      case 'Travel':
+        return Icons.flight_takeoff_outlined;
+      case 'Clothing':
+        return Icons.checkroom_outlined;
+      case 'Personal Care':
+        return Icons.favorite_border;
+      case 'Gifts':
+        return Icons.redeem;
+      case 'Dividends':
+        return Icons.pie_chart_outline;
+      case 'Rental Income':
+        return Icons.real_estate_agent_outlined;
+      default:
+        return Icons.category; // fallback icon
+    }
+  }
+
   // The final save button at the bottom of the screen
   Widget _buildSaveButton() {
     return ElevatedButton(
@@ -284,6 +351,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ),
           );
         });
+        List<AddTransaction> trans = service.getAllTransactions();
+        List<Transaction> transactions = [];
+        // now looping to the trans
+        for (var element in trans) {
+          var icon = getCategoryIcon(element.category);
+          var category = element.category;
+          var date =
+              "${element.date.year}-${element.date.month}-${element.date.day}";
+          var amount = element.amount;
+          transactions.add(
+            Transaction(
+              icon: icon,
+              category: category,
+              date: date,
+              amount: amount,
+            ),
+          );
+        }
+        Navigator.pop(context, transactions);
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF007BFF),

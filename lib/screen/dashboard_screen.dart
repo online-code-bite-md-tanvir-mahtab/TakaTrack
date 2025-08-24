@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:takatrack/viewmodel/home_logic.dart';
 
 // Converted to a StatefulWidget
 class DashboardScreen extends StatefulWidget {
@@ -12,6 +13,8 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   // Tracks the currently selected item in the bottom navigation bar
   int _selectedIndex = 0;
+
+  var _logic = HomeLogic();
 
   // Handles tap events on the bottom navigation bar items
   void _onItemTapped(int index) {
@@ -110,16 +113,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // Builds the grid of financial summary cards
   Widget _buildSummaryCards() {
-    return const Column(
+    return Column(
       children: [
         Row(
           children: [
             Expanded(
-              child: _SummaryCard(title: 'Total Income', amount: '\$12,500'),
+              child: _SummaryCard(title: 'Total Income', amount: "\$${_logic.getTotalIncome()}"),
             ),
             SizedBox(width: 16),
             Expanded(
-              child: _SummaryCard(title: 'Total Expenses', amount: '\$4,200'),
+              child: _SummaryCard(title: 'Total Expenses', amount: '\$${_logic.getTotalExpenses()}'),
             ),
           ],
         ),
@@ -127,11 +130,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Row(
           children: [
             Expanded(
-              child: _SummaryCard(title: 'Current Savings', amount: '\$8,300'),
+              child: _SummaryCard(title: 'Current Savings', amount: '\$${_logic.getCurrentSavings()}'),
             ),
             SizedBox(width: 16),
             Expanded(
-              child: _SummaryCard(title: 'Bank Balance', amount: '\$15,750'),
+              child: _SummaryCard(title: 'Bank Balance', amount: '\$${_logic.getBankBalance()}'),
             ),
           ],
         ),

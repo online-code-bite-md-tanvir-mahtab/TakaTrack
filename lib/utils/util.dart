@@ -1,11 +1,24 @@
 class Util {
   final List<String> categories = [
-    "Food",
-    "Transport",
-    "Shopping",
-    "Bills",
-    "Entertainment",
-    "Savings",
-    "Other",
-  ];
+  "Groceries",
+  "Salary",
+  "Rent",
+  "Dining Out",
+  "Utilities",
+  "Transportation",
+  "Entertainment",
+  "Shopping",
+  "Bonus",
+  "Insurance",
+  "Loan Payments",
+  "Investments",
+  "Education",
+  "Travel",
+  "Clothing",
+  "Personal Care",
+  "Gifts",
+  "Dividends",
+  "Rental Income",
+];
+
 }

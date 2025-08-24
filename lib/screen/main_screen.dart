@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:takatrack/model/add_transaction.dart';
 import 'package:takatrack/screen/add_transaction_screen.dart';
 import 'package:takatrack/screen/budget_screen.dart';
 import 'package:takatrack/screen/dashboard_screen.dart';
 import 'package:takatrack/screen/reports_screen.dart';
 import 'package:takatrack/screen/savings_goal_screen.dart';
+import 'package:takatrack/screen/transaction_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,9 +18,9 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
+  static List<Widget> _widgetOptions = <Widget>[
     DashboardScreen(),
-    AddTransactionScreen(),
+    TransactionsScreen(),
     BudgetScreen(),
     ReportsScreen(),
     SavingsGoalsScreen(),

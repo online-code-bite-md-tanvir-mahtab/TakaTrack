@@ -9,6 +9,7 @@ import 'package:takatrack/screen/main_screen.dart';
 import 'package:takatrack/screen/reports_screen.dart';
 import 'package:takatrack/screen/savings_goal_screen.dart';
 import 'package:takatrack/model/add_transaction.dart';
+import 'package:takatrack/screen/transaction_screen.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +40,7 @@ class MainApp extends StatelessWidget {
         '/reports_screen': (context) => const ReportsScreen(),
         '/savingsGoals': (context) => const SavingsGoalsScreen(),
         '/addNewGoal': (context) => const AddNewGoalScreen(),
+        '/transactions': (context) => TransactionsScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

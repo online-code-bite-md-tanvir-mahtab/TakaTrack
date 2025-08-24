@@ -69,41 +69,36 @@ class SavingsGoalsScreen extends StatelessWidget {
               ),
             ),
             // The "Add Goal" button is at the bottom
-            _buildAddGoalButton(context),
             const SizedBox(height: 20),
           ],
         ),
       ),
+      floatingActionButton: _buildAddGoalButton(context),
+      
     );
   }
 
   // The "Add Goal" button widget
   Widget _buildAddGoalButton(BuildContext context) {
-    return Center(
-      child: ElevatedButton.icon(
-        onPressed: () {
-          // Handle "Add Goal" action
-          // Navigate to the Add New Goal screen
-          Navigator.pushNamed(context, '/addNewGoal');
-        },
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          'Add Goal',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF007BFF),
-          minimumSize: const Size(double.infinity, 50),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          elevation: 0,
-        ),
+    return FloatingActionButton.extended(
+      onPressed: () {
+      // Handle "Add Goal" action
+      Navigator.pushNamed(context, '/addNewGoal');
+      },
+      icon: const Icon(Icons.add, color: Colors.white),
+      label: const Text(
+      'Add Goal',
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
       ),
+      ),
+      backgroundColor: const Color(0xFF007BFF),
+      shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12.0),
+      ),
+      elevation: 0,
     );
   }
 }
