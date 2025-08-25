@@ -1,50 +1,44 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'add_transaction.dart';
+part of 'add_goal.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class AddTransactionAdapter extends TypeAdapter<AddTransaction> {
+class AddGoalAdapter extends TypeAdapter<AddGoal> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
-  AddTransaction read(BinaryReader reader) {
+  AddGoal read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return AddTransaction(
+    return AddGoal(
       id: fields[0] as String?,
-      amount: fields[1] as double,
-      category: fields[2] as String,
-      date: fields[3] as DateTime,
-      note: fields[4] as String,
-      isIncome: fields[5] as bool,
-      status: fields[6] as String,
+      goalName: fields[1] as String,
+      goalDescription: fields[2] as String,
+      targetDate: fields[3] as DateTime,
+      targetAmount: fields[4] as double,
     );
   }
 
   @override
-  void write(BinaryWriter writer, AddTransaction obj) {
+  void write(BinaryWriter writer, AddGoal obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.amount)
+      ..write(obj.goalName)
       ..writeByte(2)
-      ..write(obj.category)
+      ..write(obj.goalDescription)
       ..writeByte(3)
-      ..write(obj.date)
+      ..write(obj.targetDate)
       ..writeByte(4)
-      ..write(obj.note)
-      ..writeByte(5)
-      ..write(obj.isIncome)
-      ..writeByte(6)
-      ..write(obj.status);
+      ..write(obj.targetAmount);
   }
 
   @override
@@ -53,7 +47,7 @@ class AddTransactionAdapter extends TypeAdapter<AddTransaction> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AddTransactionAdapter &&
+      other is AddGoalAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

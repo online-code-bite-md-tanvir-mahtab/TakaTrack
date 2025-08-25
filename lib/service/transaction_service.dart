@@ -24,4 +24,8 @@ class TransactionService {
   AddTransaction? getTransaction(String id) {
     return _transactionBox.get(id);
   }
+
+  Future<void> updateTransaction(AddTransaction transaction) async {
+    await _transactionBox.put(transaction.id, transaction);
+  }
 }

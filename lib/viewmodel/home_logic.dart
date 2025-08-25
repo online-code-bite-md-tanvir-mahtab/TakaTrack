@@ -1,14 +1,16 @@
+import 'package:takatrack/model/add_goal.dart';
 import 'package:takatrack/model/add_transaction.dart';
+import 'package:takatrack/service/goal_service.dart';
 import 'package:takatrack/service/transaction_service.dart';
 
 class HomeLogic {
   TransactionService service = TransactionService();
-  
-  double getTotalIncome(){
-    List<AddTransaction> allTrans =  service.getAllTransactions();
+
+  double getTotalIncome() {
+    List<AddTransaction> allTrans = service.getAllTransactions();
     double totalIncome = 0;
-    for(var income in allTrans){
-      if(income.isIncome == true){
+    for (var income in allTrans) {
+      if (income.isIncome == true) {
         totalIncome += income.amount;
       }
     }
@@ -46,4 +48,24 @@ class HomeLogic {
     return savings;
   }
 
+  // this is for savings progress bar
+  double getSavingsProgress() {
+    GoalService goalService = GoalService();
+
+    List<AddGoal> goals = goalService.getAllGoals();
+    double targetSavings = 0;
+    double currentSavings  = 0;
+    var count_goal = goals.length;
+    if (count_goal == 0) return 0.0;
+    for (var goal in goals) {
+      // if (goal.isCompleted == false) {
+      //   double targetSavings = goal.targetAmount;
+      //   double currentSavings = getCurrentSavings();
+      //   return (currentSavings / targetSavings).clamp(0, 1);
+      // }
+      targetSavings += goal.targetAmount;
+      currentSavings = getCurrentSavings();
+    }
+    return (currentSavings / targetSavings).clamp(0, 1);
+  }
 }

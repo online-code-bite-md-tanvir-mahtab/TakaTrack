@@ -160,7 +160,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              '66%',
+              '${(_logic.getSavingsProgress() * 100).toStringAsFixed(1)}% of Goal',
               style: TextStyle(
                 fontSize: 14,
                 color: const Color(0xFF6C757D),
@@ -171,7 +171,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         const SizedBox(height: 8),
         LinearProgressIndicator(
-          value: 0.66,
+          value: _logic.getSavingsProgress(),
           backgroundColor: const Color(0xFFE9ECEF),
           valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF1C252E)),
           minHeight: 8,
