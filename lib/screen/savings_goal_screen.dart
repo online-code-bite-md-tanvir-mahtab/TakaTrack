@@ -101,47 +101,46 @@ class _SavingsGoalsScreenState extends State<SavingsGoalsScreen> {
   }
 
   Future<List<Goal>> _fetchGoalData() async {
-  GoalService service = GoalService();
-  TransactionService tService = TransactionService();
+    GoalService service = GoalService();
+    TransactionService tService = TransactionService();
 
-  // Fetch transactions asynchronously
-  final transactions = await tService.getAllTransactions();
+    // Fetch transactions asynchronously
+    final transactions = await tService.getAllTransactions();
 
-  // Calculate total insurance amount
-  double allInsurance = 0.0;
-  for (var txn in transactions) {
-    if (txn.category == 'Insurance') {
-      allInsurance += txn.amount;
+    // Calculate total insurance amount
+    double allInsurance = 0.0;
+    for (var txn in transactions) {
+      if (txn.category == 'Insurance') {
+        allInsurance += txn.amount;
+      }
+      print("Transaction Amount: ${txn.amount}, Category: ${txn.category}");
     }
-    print("Transaction Amount: ${txn.amount}, Category: ${txn.category}");
+
+    // Fetch all goals
+    List<AddGoal> goals = await service.getAllGoals();
+    List<Goal> goalList = [];
+
+    for (var goal in goals) {
+      var icon = getGoalCategoryIcon(goal.goalName);
+
+      // Calculate progress percentage
+      double progress = goal.targetAmount > 0
+          ? (allInsurance / goal.targetAmount).clamp(0.0, 1.0)
+          : 0.0;
+
+      goalList.add(
+        Goal(
+          title: goal.goalName,
+          amount: goal.targetAmount, // Format amount as string
+          icon: icon,
+          progress: progress,
+          progressText: "${(progress * 100).toStringAsFixed(1)}%", // percentage
+        ),
+      );
+    }
+
+    return goalList;
   }
-
-  // Fetch all goals
-  List<AddGoal> goals = await service.getAllGoals();
-  List<Goal> goalList = [];
-
-  for (var goal in goals) {
-    var icon = getGoalCategoryIcon(goal.goalName);
-
-    // Calculate progress percentage
-    double progress = goal.targetAmount > 0
-        ? (allInsurance / goal.targetAmount).clamp(0.0, 1.0)
-        : 0.0;
-
-    goalList.add(
-      Goal(
-        title: goal.goalName,
-        amount: goal.targetAmount, // Format amount as string
-        icon: icon,
-        progress: progress,
-        progressText: "${(progress * 100).toStringAsFixed(1)}%", // percentage
-      ),
-    );
-  }
-
-  return goalList;
-}
-
 
   // The "Add Goal" button widget
   Widget _buildAddGoalButton(BuildContext context) {
@@ -184,32 +183,32 @@ class _SavingsGoalsScreenState extends State<SavingsGoalsScreen> {
         padding: const EdgeInsets.symmetric(
           horizontal: 16.0,
         ), // Consistent padding
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            const Text(
-              'My Goals',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF212529),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // 7. UI now handles loading and empty states
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _goals.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'No savings goals yet.\nAdd one to get started!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                    )
-                  : ListView.builder(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _goals.isEmpty
+            ? const Center(
+                child: Text(
+                  'No savings goals yet.\nAdd one to get started!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  const Text(
+                    'My Goals',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF212529),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // 7. UI now handles loading and empty states
+                  Expanded(
+                    child: ListView.builder(
                       itemCount: _goals.length,
                       itemBuilder: (context, index) {
                         final goal = _goals[index];
@@ -225,9 +224,9 @@ class _SavingsGoalsScreenState extends State<SavingsGoalsScreen> {
                         );
                       },
                     ),
-            ),
-          ],
-        ),
+                  ),
+                ],
+              ),
       ),
       floatingActionButton: _buildAddGoalButton(context),
     );
