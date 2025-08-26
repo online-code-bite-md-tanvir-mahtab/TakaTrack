@@ -31,6 +31,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       ),
     );
   }
+  bool _isLoading = true;
 
   List<Transaction> _transactions = [];
 
@@ -52,13 +53,32 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return transactions;
   }
 
+  Future<void> _loadGoals() async {
+    // The fetchGoalData logic is now part of the state
+    try {
+      final trans = await fetchTransData();
+      // Use `mounted` check to avoid calling setState on a disposed widget
+      if (mounted) {
+        // 5. setState triggers a UI rebuild with the new data
+        setState(() {
+          _transactions = trans;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching goals: $e");
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    fetchTransData().then((value) {
-      setState(() =>
-      _transactions = value);
-    });
+    _loadGoals();
   }
 
   IconData getCategoryIcon(String category) {
@@ -173,11 +193,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFEFEFEF),
       body: SafeArea(
-      child: _transactions.isEmpty
-        ? const Center(
-          child: CircularProgressIndicator(),
-          )
-        : _transactions.isEmpty
+      child:  _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _transactions.isEmpty
+            ? const Center(
+                child: Text(
+                  'No transactions yet.\nAdd one to get started!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              )
+            : _transactions.isEmpty
           ? const Center(
             child: Text(
               'No transactions available.',
