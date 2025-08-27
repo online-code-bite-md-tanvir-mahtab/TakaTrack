@@ -54,7 +54,7 @@ class HomeLogic {
 
     List<AddGoal> goals = goalService.getAllGoals();
     double targetSavings = 0;
-    double currentSavings  = 0;
+    double currentSavings = 0;
     var count_goal = goals.length;
     if (count_goal == 0) return 0.0;
     for (var goal in goals) {
@@ -67,5 +67,21 @@ class HomeLogic {
       currentSavings = getCurrentSavings();
     }
     return (currentSavings / targetSavings).clamp(0, 1);
+  }
+
+  /// Returns the data for a bar chart comparing income and expenses.
+  /// The result is a map with 'Income' and 'Expenses' as keys and their totals as values.
+  Map<String, List<double>> getIncomeExpensesBarChartData() {
+    List<AddTransaction> allTrans = service.getAllTransactions();
+    List<double> allinomeTrans = [];
+    List<double> allexpenseTrans = [];
+    for (var income in allTrans) {
+      if (income.isIncome == true) {
+        allinomeTrans.add(income.amount);
+      } else {
+        allexpenseTrans.add(income.amount);
+      }
+    }
+    return {'Income': allinomeTrans, 'Expenses': allexpenseTrans};
   }
 }

@@ -118,11 +118,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Row(
           children: [
             Expanded(
-              child: _SummaryCard(title: 'Total Income', amount: "\$${_logic.getTotalIncome()}"),
+              child: _SummaryCard(
+                title: 'Total Income',
+                amount: "\$${_logic.getTotalIncome()}",
+              ),
             ),
             SizedBox(width: 16),
             Expanded(
-              child: _SummaryCard(title: 'Total Expenses', amount: '\$${_logic.getTotalExpenses()}'),
+              child: _SummaryCard(
+                title: 'Total Expenses',
+                amount: '\$${_logic.getTotalExpenses()}',
+              ),
             ),
           ],
         ),
@@ -130,11 +136,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Row(
           children: [
             Expanded(
-              child: _SummaryCard(title: 'Current Savings', amount: '\$${_logic.getCurrentSavings()}'),
+              child: _SummaryCard(
+                title: 'Current Savings',
+                amount: '\$${_logic.getCurrentSavings()}',
+              ),
             ),
             SizedBox(width: 16),
             Expanded(
-              child: _SummaryCard(title: 'Bank Balance', amount: '\$${_logic.getBankBalance()}'),
+              child: _SummaryCard(
+                title: 'Bank Balance',
+                amount: '\$${_logic.getBankBalance()}',
+              ),
             ),
           ],
         ),
@@ -179,6 +191,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ],
     );
+  }
+
+  List<BarChartGroupData> chartData() {
+    for (var income
+        in _logic.getIncomeExpensesBarChartData()['allinomeTrans']!) {}
+    for (var expense
+        in _logic.getIncomeExpensesBarChartData()['allexpenseTrans']!) {}
+    return [
+      makeGroupData(0, 5),
+      makeGroupData(1, 16.5),
+      makeGroupData(2, 10),
+      makeGroupData(3, 11),
+      makeGroupData(4, 19),
+      makeGroupData(5, 15),
+    ];
   }
 
   // Builds the bar chart for income vs. expenses
