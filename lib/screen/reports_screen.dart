@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:takatrack/viewmodel/report_logic.dart';
 
 // Enum to manage the state of the Monthly/Yearly tabs
 enum ReportPeriod { monthly, yearly }
@@ -14,15 +15,33 @@ class ReportsScreen extends StatefulWidget {
 class _ReportsScreenState extends State<ReportsScreen> {
   ReportPeriod _selectedPeriod = ReportPeriod.monthly;
   int _selectedBottomNavIndex = 3; // Index for 'Reports'
+  var _income;
+  @override
+  void initState() {
+    super.initState();
+    ReportLogic reportLogic = ReportLogic();
+    Map<String,List<dynamic>> months = reportLogic.getAllTransactionMonthNames();
+    _income = months;
+    print("Months with transactions: $_income");
+  }
+
+  List<FlSpot> _incomeSpots (){
+    List<FlSpot> income = [];
+    for (int i = 0; i < _income.length; i++) {
+      print("Income for month ${i+1}: ${income[i]}");
+      income.add(FlSpot(i.toDouble(), double.parse(income[i].toString())));
+    }
+    return income;
+  }
 
   // Dummy data for the charts
-  final List<FlSpot> _incomeSpots = const [
-    FlSpot(0, 3),
-    FlSpot(1, 4),
-    FlSpot(2, 2.5),
-    FlSpot(3, 5),
-    FlSpot(4, 4),
-  ];
+  // final List<FlSpot> _incomeSpots = const [
+  //   FlSpot(0, 3),
+  //   FlSpot(1, 4),
+  //   FlSpot(2, 2.5),
+  //   FlSpot(3, 5),
+  //   FlSpot(4, 4),
+  // ];
   final List<FlSpot> _expenseSpots = const [
     FlSpot(0, 2),
     FlSpot(1, 3.5),
@@ -75,7 +94,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 amount: '\$2,500',
                 change: '+10%',
                 changeColor: Colors.green,
-                spots: _incomeSpots,
+                spots: _incomeSpots(),
                 bottomTitles: _getMonthlyTitles,
               ),
               const SizedBox(height: 16),

@@ -6,6 +6,17 @@ import 'package:takatrack/service/transaction_service.dart';
 class HomeLogic {
   TransactionService service = TransactionService();
 
+  List<int> getAllTransactionDates() {
+    List<AddTransaction> allTrans = service.getAllTransactions();
+    List<int> days = [];
+    for (var day in allTrans) {
+      if (!days.contains(day.date.day)) {
+        days.add(day.date.day);
+      }
+    }
+    return days;
+  }
+
   double getTotalIncome() {
     List<AddTransaction> allTrans = service.getAllTransactions();
     double totalIncome = 0;
@@ -73,15 +84,19 @@ class HomeLogic {
   /// The result is a map with 'Income' and 'Expenses' as keys and their totals as values.
   Map<String, List<double>> getIncomeExpensesBarChartData() {
     List<AddTransaction> allTrans = service.getAllTransactions();
+    // print("allTrans: $allTrans");
     List<double> allinomeTrans = [];
     List<double> allexpenseTrans = [];
     for (var income in allTrans) {
-      if (income.isIncome == true) {
+      print(income.status);
+      if (income.status == "income") {
         allinomeTrans.add(income.amount);
       } else {
         allexpenseTrans.add(income.amount);
       }
     }
+    print(allinomeTrans);
+    print(allexpenseTrans);
     return {'Income': allinomeTrans, 'Expenses': allexpenseTrans};
   }
 }

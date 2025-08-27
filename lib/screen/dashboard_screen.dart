@@ -15,12 +15,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
   var _logic = HomeLogic();
+  List<int> days = [];
 
   // Handles tap events on the bottom navigation bar items
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    days = _logic.getAllTransactionDates();
+    print(" days: $days");
   }
 
   @override
@@ -194,18 +203,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   List<BarChartGroupData> chartData() {
-    for (var income
-        in _logic.getIncomeExpensesBarChartData()['allinomeTrans']!) {}
-    for (var expense
-        in _logic.getIncomeExpensesBarChartData()['allexpenseTrans']!) {}
-    return [
-      makeGroupData(0, 5),
-      makeGroupData(1, 16.5),
-      makeGroupData(2, 10),
-      makeGroupData(3, 11),
-      makeGroupData(4, 19),
-      makeGroupData(5, 15),
-    ];
+    final data = _logic.getIncomeExpensesBarChartData();
+    final incomes = data['Income']  ?? [];
+    final expenses = data['Expenses']  ?? [];
+
+    List<BarChartGroupData> groups = [];
+    int length = incomes.length + expenses.length;
+print(length);
+    for (int i = 0; i < length; i++) {
+      double income = i < incomes.length ? incomes[i] : 0;
+      double expense = i < expenses.length ? expenses[i] : 0;
+      // You can visualize both income and expense as two bars per group if needed.
+      groups.add(
+        makeGroupData(i, income - expense),
+      );
+    }
+    return groups;
   }
 
   // Builds the bar chart for income vs. expenses
@@ -215,8 +228,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
-          maxY: 20,
-          barTouchData: BarTouchData(enabled: false),
+          maxY: 80000,
+          barTouchData: BarTouchData(enabled: true),
           titlesData: FlTitlesData(
             leftTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
@@ -231,20 +244,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: getBottomTitles,
-                reservedSize: 38,
+                reservedSize: 50,
               ),
             ),
           ),
           gridData: const FlGridData(show: false),
           borderData: FlBorderData(show: false),
-          barGroups: [
-            makeGroupData(0, 5),
-            makeGroupData(1, 16.5),
-            makeGroupData(2, 10),
-            makeGroupData(3, 11),
-            makeGroupData(4, 19),
-            makeGroupData(5, 15),
-          ],
+          barGroups: chartData(),
         ),
       ),
     );
@@ -269,7 +275,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // Helper function to create the labels for the bottom axis of the chart
-  static Widget getBottomTitles(double value, TitleMeta meta) {
+  Widget getBottomTitles(double value, TitleMeta meta) {
     const style = TextStyle(
       color: Color(0xFF6C757D),
       fontWeight: FontWeight.bold,
@@ -277,26 +283,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
 
     // List of month abbreviations
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
     String text = '';
-    if (value.toInt() >= 0 && value.toInt() < months.length) {
-      text = months[value.toInt()];
-    }
 
+    if (days.isEmpty) {
+      text = '';
+      
+    } else {
+      text = days[value.toInt() % days.length].toString();
+    }
     return SideTitleWidget(
       meta: meta,
       space: 8, // reduce space a bit for better fit
