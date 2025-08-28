@@ -7,47 +7,42 @@ class ReportLogic {
   GoalService goalService = GoalService();
 
   Map<String, List<dynamic>> getAllTransactionMonthNames() {
-    List<AddTransaction> allTrans = service.getAllTransactions();
-    Set<double> uniqueMonths = {};
-    print("all trans: $allTrans");
+  List<AddTransaction> allTrans = service.getAllTransactions();
+  
+  // Map to store month -> total amount
+  Map<String, double> monthlyTotals = {};
 
-    for (var trans in allTrans) {
-      print("single amount : ${trans.amount}");
-      uniqueMonths.add(trans.amount);
-    }
-    List<String> monthNames = [];
-    for (var month in allTrans) {
-      monthNames.add(_monthName(month.date.month));
-    }
-
-    // Calculate monthly income and store in a list
-    List<double> monthlyIncome = List.filled(allTrans.length, 0.0);
-    for (var trans in allTrans) {
-      if (trans.status == "income") {
-        int monthIndex = trans.date.month;
-        if (monthIndex >= 0 && monthIndex < allTrans.length) {
-          monthlyIncome[monthIndex] += trans.amount;
-        }
-      }
-    }
-    // Now monthlyIncome contains total income for each month (index 0 = January, etc.)
-    return {'monthNames': monthNames, 'monthlyIncome': uniqueMonths.toList()};
+  for (var trans in allTrans) {
+    final monthName = _monthName(trans.date.month);
+    // Sum amounts per month
+    monthlyTotals[monthName] = (monthlyTotals[monthName] ?? 0) + trans.amount;
   }
+
+  // Separate lists for chart or UI
+  List<String> monthNames = monthlyTotals.keys.toList();
+  List<double> monthlyIncome = monthlyTotals.values.toList();
+
+  return {
+    'monthNames': monthNames,
+    'monthlyIncome': monthlyIncome,
+  };
+}
+
 
   String _monthName(int month) {
     const monthNames = [
-      'January',
-      'February',
-      'March',
-      'April',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
       'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     if (month >= 1 && month <= 12) {
       return monthNames[month - 1];

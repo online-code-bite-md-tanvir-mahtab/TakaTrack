@@ -228,7 +228,7 @@ print(length);
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
-          maxY: 80000,
+          maxY: _logic.getTotalIncome(),
           barTouchData: BarTouchData(enabled: true),
           titlesData: FlTitlesData(
             leftTitles: const AxisTitles(

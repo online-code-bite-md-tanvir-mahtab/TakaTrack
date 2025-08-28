@@ -40,13 +40,26 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return income;
   }
 
-  List<dynamic> _monthlyIncome() {
-    List<dynamic> months = [];
-    for (var month in _income['monthNames']) {
-      print("month: $month");
-      months.add(FlSpot(months.length.toDouble(), 0)); // Dummy y-value
+  List<String> _monthlyLabels() {
+    // If _income['monthlyIncome'] is a list of numbers, use month names from _income['months']
+    // If it's a list of maps with 'date', extract month/year from each entry
+    if (_income != null && _income['monthNames'] != null) {
+      return List<String>.from(_income['monthNames']);
     }
-    return months;
+    return [];
+  }
+
+  Widget _getDynamicMonthlyTitles(double value, TitleMeta meta) {
+    const style = TextStyle(color: Colors.grey, fontSize: 12);
+    final labels = _monthlyLabels();
+    String text = (value.toInt() >= 0 && value.toInt() < labels.length)
+        ? labels[value.toInt()]
+        : 'null';
+    return SideTitleWidget(
+      meta: meta,
+      space: 8,
+      child: Text(text, style: style),
+    );
   }
 
   // Dummy data for the charts
@@ -110,7 +123,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 change: '+10%',
                 changeColor: Colors.green,
                 spots: _incomeSpots(),
-                bottomTitles: _monthlyIncome(),
+                bottomTitles:_getDynamicMonthlyTitles ,
               ),
               const SizedBox(height: 16),
               _ReportCard(
@@ -192,6 +205,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // --- Chart Title Helper Methods ---
 
   static Widget _getMonthlyTitles(double value, TitleMeta meta) {
+    print("the value is $value");
     const style = TextStyle(color: Colors.grey, fontSize: 12);
     String text;
     switch (value.toInt()) {
