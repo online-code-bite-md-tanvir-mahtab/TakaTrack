@@ -20,18 +20,33 @@ class _ReportsScreenState extends State<ReportsScreen> {
   void initState() {
     super.initState();
     ReportLogic reportLogic = ReportLogic();
-    Map<String,List<dynamic>> months = reportLogic.getAllTransactionMonthNames();
+    Map<String, List<dynamic>> months = reportLogic
+        .getAllTransactionMonthNames();
     _income = months;
     print("Months with transactions: $_income");
   }
 
-  List<FlSpot> _incomeSpots (){
+  List<FlSpot> _incomeSpots() {
     List<FlSpot> income = [];
-    for (int i = 0; i < _income.length; i++) {
-      print("Income for month ${i+1}: ${income[i]}");
-      income.add(FlSpot(i.toDouble(), double.parse(income[i].toString())));
+    for (int i = 0; i < _income['monthlyIncome'].length; i++) {
+      print("index $i -> ${_income['monthlyIncome'][i]}");
+      income.add(
+        FlSpot(
+          i.toDouble(), // index as double
+          _income['monthlyIncome'][i].toDouble(), // convert safely to double
+        ),
+      );
     }
     return income;
+  }
+
+  List<dynamic> _monthlyIncome() {
+    List<dynamic> months = [];
+    for (var month in _income['monthNames']) {
+      print("month: $month");
+      months.add(FlSpot(months.length.toDouble(), 0)); // Dummy y-value
+    }
+    return months;
   }
 
   // Dummy data for the charts
@@ -95,7 +110,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 change: '+10%',
                 changeColor: Colors.green,
                 spots: _incomeSpots(),
-                bottomTitles: _getMonthlyTitles,
+                bottomTitles: _monthlyIncome(),
               ),
               const SizedBox(height: 16),
               _ReportCard(
@@ -174,33 +189,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  // Builds the shared bottom navigation bar
-  Widget _buildBottomNavigationBar() {
-    return BottomNavigationBar(
-      currentIndex: _selectedBottomNavIndex,
-      onTap: (index) {
-        setState(() {
-          _selectedBottomNavIndex = index;
-        });
-      },
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
-      selectedItemColor: const Color(0xFF212529),
-      unselectedItemColor: const Color(0xFF6C757D),
-      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Dashboard'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.list_alt),
-          label: 'Transactions',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.pie_chart), label: 'Budget'),
-        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Reports'),
-        BottomNavigationBarItem(icon: Icon(Icons.emoji_events), label: 'Goals'),
-      ],
-    );
-  }
-
   // --- Chart Title Helper Methods ---
 
   static Widget _getMonthlyTitles(double value, TitleMeta meta) {
@@ -220,6 +208,21 @@ class _ReportsScreenState extends State<ReportsScreen> {
         text = 'Apr';
         break;
       case 4:
+        text = 'May';
+        break;
+      case 5:
+        text = 'Jan';
+        break;
+      case 6:
+        text = 'Feb';
+        break;
+      case 7:
+        text = 'Mar';
+        break;
+      case 8:
+        text = 'Apr';
+        break;
+      case 9:
         text = 'May';
         break;
       default:
