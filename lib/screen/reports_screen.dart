@@ -13,9 +13,12 @@ class ReportsScreen extends StatefulWidget {
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
-  ReportPeriod _selectedPeriod = ReportPeriod.monthly;
+  ReportPeriod _selectedPeriod = ReportPeriod.yearly;
   int _selectedBottomNavIndex = 3; // Index for 'Reports'
   var _income;
+  var _expenses;
+  var _savings;
+  var _expense_details;
   @override
   void initState() {
     super.initState();
@@ -23,7 +26,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
     Map<String, List<dynamic>> months = reportLogic
         .getAllTransactionMonthNames();
     _income = months;
-    print("Months with transactions: $_income");
+    Map<String, List<dynamic>> expMonths = reportLogic
+        .getAllExpansesMonthNames();
+    _expenses = expMonths;
+    Map<String, List<dynamic>> savMonths = reportLogic.getAllSavingMonthNames();
+    _savings = savMonths;
+
+    Map<String, List<dynamic>> expDetails = reportLogic
+        .getAllExpenseBrackdownMonthNames();
+    _expense_details = expDetails;
+    print("Months with transactions: $_expense_details");
   }
 
   List<FlSpot> _incomeSpots() {
@@ -38,6 +50,22 @@ class _ReportsScreenState extends State<ReportsScreen> {
       );
     }
     return income;
+  }
+
+  Map<String, dynamic> _getTotalYearlyIncome() {
+    double total = 0;
+    double percent = 0;
+    List<dynamic> monthlyIncome = _income['monthlyIncome'] ?? [];
+    for (var amount in monthlyIncome) {
+      total += amount;
+    }
+    if (monthlyIncome.length > 1 &&
+        monthlyIncome[monthlyIncome.length - 2] != 0) {
+      double lastMonth = monthlyIncome[monthlyIncome.length - 1];
+      double prevMonth = monthlyIncome[monthlyIncome.length - 2];
+      percent = ((lastMonth - prevMonth) / prevMonth) * 100;
+    }
+    return {'total': total, 'percent': percent};
   }
 
   List<String> _monthlyLabels() {
@@ -62,35 +90,163 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  // Dummy data for the charts
-  // final List<FlSpot> _incomeSpots = const [
-  //   FlSpot(0, 3),
-  //   FlSpot(1, 4),
-  //   FlSpot(2, 2.5),
-  //   FlSpot(3, 5),
-  //   FlSpot(4, 4),
-  // ];
-  final List<FlSpot> _expenseSpots = const [
-    FlSpot(0, 2),
-    FlSpot(1, 3.5),
-    FlSpot(2, 2),
-    FlSpot(3, 4),
-    FlSpot(4, 3),
-  ];
-  final List<FlSpot> _savingsSpots = const [
-    FlSpot(0, 1),
-    FlSpot(1, 2),
-    FlSpot(2, 1.5),
-    FlSpot(3, 3),
-    FlSpot(4, 2.5),
-  ];
-  final List<FlSpot> _breakdownSpots = const [
-    FlSpot(0, 3),
-    FlSpot(1, 2),
-    FlSpot(2, 4),
-    FlSpot(3, 3.5),
-    FlSpot(4, 5),
-  ];
+  List<FlSpot> _expanseSpots() {
+    List<FlSpot> expenses = [];
+    for (int i = 0; i < _expenses['monthlyExpenses'].length; i++) {
+      print("index $i -> ${_expenses['monthlyExpenses'][i]}");
+      expenses.add(
+        FlSpot(
+          i.toDouble(), // index as double
+          _expenses['monthlyExpenses'][i]
+              .toDouble(), // convert safely to double
+        ),
+      );
+    }
+    return expenses;
+  }
+
+  Map<String, dynamic> _getTotalYearlyExpense() {
+    double total = 0;
+    double percent = 0;
+    List<dynamic> monthlyIncome = _expenses['monthlyExpenses'] ?? [];
+    for (var amount in monthlyIncome) {
+      total += amount;
+    }
+    if (monthlyIncome.length > 1 &&
+        monthlyIncome[monthlyIncome.length - 2] != 0) {
+      double lastMonth = monthlyIncome[monthlyIncome.length - 1];
+      double prevMonth = monthlyIncome[monthlyIncome.length - 2];
+      percent = ((lastMonth - prevMonth) / prevMonth) * 100;
+    }
+    return {'total': total, 'percent': percent};
+  }
+
+  List<String> _monthlyLabels2() {
+    // If _income['monthlyIncome'] is a list of numbers, use month names from _income['months']
+    // If it's a list of maps with 'date', extract month/year from each entry
+    if (_expenses != null && _expenses['monthNames'] != null) {
+      return List<String>.from(_expenses['monthNames']);
+    }
+    return [];
+  }
+
+  Widget _getDynamicMonthlyTitles2(double value, TitleMeta meta) {
+    const style = TextStyle(color: Colors.grey, fontSize: 12);
+    final labels = _monthlyLabels2();
+    String text = (value.toInt() >= 0 && value.toInt() < labels.length)
+        ? labels[value.toInt()]
+        : 'null';
+    return SideTitleWidget(
+      meta: meta,
+      space: 8,
+      child: Text(text, style: style),
+    );
+  }
+
+  List<FlSpot> _savingSpots() {
+    List<FlSpot> expenses = [];
+    for (int i = 0; i < _savings['monthlyExpenses'].length; i++) {
+      print("index $i -> ${_savings['monthlyExpenses'][i]}");
+      expenses.add(
+        FlSpot(
+          i.toDouble(), // index as double
+          _savings['monthlyExpenses'][i].toDouble(), // convert safely to double
+        ),
+      );
+    }
+    return expenses;
+  }
+
+  Map<String, dynamic> _getTotalYearlySavings() {
+    double total = 0;
+    double percent = 0;
+    List<dynamic> monthlyIncome = _savings['monthlyExpenses'] ?? [];
+    for (var amount in monthlyIncome) {
+      total += amount;
+    }
+    if (monthlyIncome.length > 1 &&
+        monthlyIncome[monthlyIncome.length - 2] != 0) {
+      double lastMonth = monthlyIncome[monthlyIncome.length - 1];
+      double prevMonth = monthlyIncome[monthlyIncome.length - 2];
+      percent = ((lastMonth - prevMonth) / prevMonth) * 100;
+    }
+    return {'total': total, 'percent': percent};
+  }
+
+  List<String> _monthlyLabels3() {
+    // If _income['monthlyIncome'] is a list of numbers, use month names from _income['months']
+    // If it's a list of maps with 'date', extract month/year from each entry
+    if (_savings != null && _savings['monthNames'] != null) {
+      return List<String>.from(_savings['monthNames']);
+    }
+    return [];
+  }
+
+  Widget _getDynamicMonthlyTitles3(double value, TitleMeta meta) {
+    const style = TextStyle(color: Colors.grey, fontSize: 12);
+    final labels = _monthlyLabels3();
+    String text = (value.toInt() >= 0 && value.toInt() < labels.length)
+        ? labels[value.toInt()]
+        : 'null';
+    return SideTitleWidget(
+      meta: meta,
+      space: 8,
+      child: Text(text, style: style),
+    );
+  }
+
+  List<FlSpot> _brackDownSpots() {
+    List<FlSpot> expenses = [];
+    for (int i = 0; i < _expense_details['categoryExpenses'].length; i++) {
+      print("index $i -> ${_expense_details['categoryExpenses'][i]}");
+      expenses.add(
+        FlSpot(
+          i.toDouble(), // index as double
+          _expense_details['categoryExpenses'][i]
+              .toDouble(), // convert safely to double
+        ),
+      );
+    }
+    return expenses;
+  }
+
+  Map<String, dynamic> _getTotalYearlyBreakdown() {
+    double total = 0;
+    double percent = 0;
+    List<dynamic> monthlyIncome = _expense_details['categoryExpenses'] ?? [];
+    for (var amount in monthlyIncome) {
+      total += amount;
+    }
+    if (monthlyIncome.length > 1 &&
+        monthlyIncome[monthlyIncome.length - 2] != 0) {
+      double lastMonth = monthlyIncome[monthlyIncome.length - 1];
+      double prevMonth = monthlyIncome[monthlyIncome.length - 2];
+      percent = ((lastMonth - prevMonth) / prevMonth) * 100;
+    }
+    return {'total': total, 'percent': percent};
+  }
+
+  List<String> _monthlyLabels4() {
+    // If _income['monthlyIncome'] is a list of numbers, use month names from _income['months']
+    // If it's a list of maps with 'date', extract month/year from each entry
+    if (_savings != null && _expense_details['categoryNames'] != null) {
+      return List<String>.from(_expense_details['categoryNames']);
+    }
+    return [];
+  }
+
+  Widget _getDynamicMonthlyTitles4(double value, TitleMeta meta) {
+    const style = TextStyle(color: Colors.grey, fontSize: 12);
+    final labels = _monthlyLabels4();
+    String text = (value.toInt() >= 0 && value.toInt() < labels.length)
+        ? labels[value.toInt()]
+        : 'null';
+    return SideTitleWidget(
+      meta: meta,
+      space: 8,
+      child: Text(text, style: style),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,29 +275,50 @@ class _ReportsScreenState extends State<ReportsScreen> {
               const SizedBox(height: 24),
               _ReportCard(
                 title: 'Income',
-                amount: '\$2,500',
-                change: '+10%',
-                changeColor: Colors.green,
+                amount:
+                    '\$${_getTotalYearlyIncome()['total'].toStringAsFixed(1)}',
+                change:
+                    '${_getTotalYearlyIncome()['percent'].toStringAsFixed(1)}%',
+                changeColor: _getTotalYearlyIncome()['percent'] >= 0
+                    ? Colors.green
+                    : Colors.red,
                 spots: _incomeSpots(),
-                bottomTitles:_getDynamicMonthlyTitles ,
+                monthoryear: _selectedPeriod == ReportPeriod.monthly
+                    ? 'month'
+                    : 'year',
+                bottomTitles: _getDynamicMonthlyTitles,
               ),
               const SizedBox(height: 16),
               _ReportCard(
                 title: 'Expenses',
-                amount: '\$1,800',
-                change: '-5%',
-                changeColor: Colors.red,
-                spots: _expenseSpots,
-                bottomTitles: _getMonthlyTitles,
+                amount:
+                    '\$${_getTotalYearlyExpense()['total'].toStringAsFixed(1)}',
+                change:
+                    '${_getTotalYearlyExpense()['percent'].toStringAsFixed(1)}%',
+                changeColor: _getTotalYearlyExpense()['percent'] >= 0
+                    ? Colors.green
+                    : Colors.red,
+                spots: _expanseSpots(),
+                monthoryear: _selectedPeriod == ReportPeriod.monthly
+                    ? 'month'
+                    : 'year',
+                bottomTitles: _getDynamicMonthlyTitles2,
               ),
               const SizedBox(height: 16),
               _ReportCard(
                 title: 'Savings',
-                amount: '\$700',
-                change: '+15%',
-                changeColor: Colors.green,
-                spots: _savingsSpots,
-                bottomTitles: _getMonthlyTitles,
+                amount:
+                    '\$${_getTotalYearlySavings()['total'].toStringAsFixed(1)}',
+                change:
+                    '${_getTotalYearlySavings()['percent'].toStringAsFixed(1)}%',
+                changeColor: _getTotalYearlySavings()['percent'] >= 0
+                    ? Colors.green
+                    : Colors.red,
+                spots: _savingSpots(),
+                monthoryear: _selectedPeriod == ReportPeriod.monthly
+                    ? 'month'
+                    : 'year',
+                bottomTitles: _getDynamicMonthlyTitles3,
               ),
               const SizedBox(height: 24),
               const Text(
@@ -151,10 +328,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
               const SizedBox(height: 16),
               _ReportCard(
                 title: 'Expenses',
-                amount: '\$1,800',
-                subtitle: 'This month',
-                spots: _breakdownSpots,
-                bottomTitles: _getCategoryTitles,
+                amount:
+                    '\$${_getTotalYearlyBreakdown()['total'].toStringAsFixed(1)}',
+                subtitle:
+                    'This ${_selectedPeriod == ReportPeriod.monthly ? 'month' : 'year'}',
+                spots: _brackDownSpots(),
+                monthoryear: _selectedPeriod == ReportPeriod.monthly
+                    ? 'month'
+                    : 'year',
+                bottomTitles: _getDynamicMonthlyTitles4,
               ),
               const SizedBox(height: 24),
             ],
@@ -178,6 +360,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // Helper widget for a single tab
   Widget _buildPeriodTab(String title, ReportPeriod period) {
     bool isSelected = _selectedPeriod == period;
+    print("the period is $period and selected is $_selectedPeriod");
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -287,6 +470,7 @@ class _ReportCard extends StatelessWidget {
   final String? subtitle;
   final Color? changeColor;
   final List<FlSpot> spots;
+  final String? monthoryear;
   final Widget Function(double, TitleMeta) bottomTitles;
 
   const _ReportCard({
@@ -296,6 +480,7 @@ class _ReportCard extends StatelessWidget {
     this.subtitle,
     this.changeColor,
     required this.spots,
+    required this.monthoryear,
     required this.bottomTitles,
   });
 
@@ -328,7 +513,7 @@ class _ReportCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'This month ',
+                  'This ${monthoryear} ',
                   style: TextStyle(color: Colors.grey[600], fontSize: 14),
                 ),
                 Text(
