@@ -35,7 +35,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
     Map<String, List<dynamic>> expDetails = reportLogic
         .getAllExpenseBrackdownMonthNames();
     _expense_details = expDetails;
-    print("Months with transactions: $_expense_details");
+
+    Map<String, List<dynamic>> onlyMonths = reportLogic
+        .getAllTransactionMonthWithDate();
+    Map<String, List<dynamic>> onlyExpMonths = reportLogic
+        .getAllExpansesMonthWithday();
+    print("Months with transactions: $onlyExpMonths");
   }
 
   List<FlSpot> _incomeSpots() {

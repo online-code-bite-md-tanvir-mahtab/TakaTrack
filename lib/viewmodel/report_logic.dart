@@ -30,6 +30,30 @@ class ReportLogic {
     return {'monthNames': monthNames, 'monthlyIncome': monthlyIncome};
   }
 
+  Map<String, List<dynamic>> getAllTransactionMonthWithDate() {
+    List<AddTransaction> allTrans = service.getAllTransactions();
+
+    // Map to store month -> total amount
+    Map<String, double> monthlyTotals = {};
+
+    for (var trans in allTrans) {
+      if (trans.status != 'income') {
+        continue; // Skip non-income transactions
+      } else {
+        final monthName = trans.date.day.toString() + '/${trans.date.month}';
+        // Sum amounts per month
+        monthlyTotals[monthName] =
+            (monthlyTotals[monthName] ?? 0) + trans.amount;
+      }
+    }
+
+    // Separate lists for chart or UI
+    List<String> monthNames = monthlyTotals.keys.toList();
+    List<double> monthlyIncome = monthlyTotals.values.toList();
+
+    return {'monthNames': monthNames, 'monthlyIncome': monthlyIncome};
+  }
+
   Map<String, List<dynamic>> getAllExpansesMonthNames() {
     List<AddTransaction> allTrans = service.getAllTransactions();
 
@@ -41,6 +65,30 @@ class ReportLogic {
         continue; // Skip non-income transactions
       } else {
         final monthName = _monthName(trans.date.month);
+        // Sum amounts per month
+        monthlyTotals[monthName] =
+            (monthlyTotals[monthName] ?? 0) + trans.amount;
+      }
+    }
+
+    // Separate lists for chart or UI
+    List<String> monthNames = monthlyTotals.keys.toList();
+    List<double> monthlyExpenses = monthlyTotals.values.toList();
+
+    return {'monthNames': monthNames, 'monthlyExpenses': monthlyExpenses};
+  }
+
+  Map<String, List<dynamic>> getAllExpansesMonthWithday() {
+    List<AddTransaction> allTrans = service.getAllTransactions();
+
+    // Map to store month -> total amount
+    Map<String, double> monthlyTotals = {};
+
+    for (var trans in allTrans) {
+      if (trans.status != 'expense') {
+        continue; // Skip non-income transactions
+      } else {
+        final monthName = trans.date.day.toString() + '/${trans.date.month}';
         // Sum amounts per month
         monthlyTotals[monthName] =
             (monthlyTotals[monthName] ?? 0) + trans.amount;
