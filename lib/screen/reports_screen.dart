@@ -22,6 +22,33 @@ class _ReportsScreenState extends State<ReportsScreen> {
   @override
   void initState() {
     super.initState();
+    // TODO: this is for the monthly with date
+    if (_selectedPeriod == ReportPeriod.monthly) {
+      print("monthly selected");
+      _loadMonthlyData();
+    }else{
+      _loadYealyData();
+    }
+  }
+
+  void _loadMonthlyData() {
+    ReportLogic reportLogic = ReportLogic();
+    Map<String, List<dynamic>> onlyMonths = reportLogic
+        .getAllTransactionMonthWithDate();
+    _income = onlyMonths;
+    Map<String, List<dynamic>> onlyExpMonths = reportLogic
+        .getAllExpansesMonthWithday();
+    _expenses = onlyExpMonths;
+    Map<String, List<dynamic>> onlySavMonths = reportLogic
+        .getAllSavingMonthbyDay();
+    _savings = onlySavMonths;
+    Map<String, List<dynamic>> onlyExpDetails = reportLogic
+        .getAllExpenseBrackdownMonthWithday();
+    _expense_details = onlyExpDetails;
+    print("Months with transactions: $onlyExpDetails");
+  }
+
+  void _loadYealyData(){
     ReportLogic reportLogic = ReportLogic();
     Map<String, List<dynamic>> months = reportLogic
         .getAllTransactionMonthNames();
@@ -35,12 +62,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
     Map<String, List<dynamic>> expDetails = reportLogic
         .getAllExpenseBrackdownMonthNames();
     _expense_details = expDetails;
-
-    Map<String, List<dynamic>> onlyMonths = reportLogic
-        .getAllTransactionMonthWithDate();
-    Map<String, List<dynamic>> onlyExpMonths = reportLogic
-        .getAllExpansesMonthWithday();
-    print("Months with transactions: $onlyExpMonths");
   }
 
   List<FlSpot> _incomeSpots() {
@@ -255,15 +276,21 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_selectedPeriod == ReportPeriod.monthly) {
+      print("monthly selected");
+      setState(() {
+        _loadMonthlyData();
+      });
+    }else{
+      setState(() {
+        _loadYealyData();
+      });
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFFF8F9FA),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
-        ),
         title: const Text(
           'Reports',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),

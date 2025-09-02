@@ -10,6 +10,7 @@ import 'package:takatrack/screen/main_screen.dart';
 import 'package:takatrack/screen/reports_screen.dart';
 import 'package:takatrack/screen/savings_goal_screen.dart';
 import 'package:takatrack/model/add_transaction.dart';
+import 'package:takatrack/screen/transaction_detail_screen.dart';
 import 'package:takatrack/screen/transaction_screen.dart';
 
 void main() async{
@@ -44,6 +45,7 @@ class MainApp extends StatelessWidget {
         '/savingsGoals': (context) => const SavingsGoalsScreen(),
         '/addNewGoal': (context) => const AddNewGoalScreen(),
         '/transactions': (context) => TransactionsScreen(),
+        '/transdetails': (context) => TransactionDetailsScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

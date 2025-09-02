@@ -14,6 +14,9 @@ class TransactionsScreen extends StatefulWidget {
 }
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
+
+
+  TransactionService service = TransactionService();
   // Builds the custom app bar at the top of the card
   Widget _buildAppBar() {
     return Padding(
@@ -36,7 +39,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   List<Transaction> _transactions = [];
 
   Future<List<Transaction>> fetchTransData() async{
-    TransactionService service = TransactionService();
     List<AddTransaction> trans = service.getAllTransactions();
     List<Transaction> transactions = [];
     // now looping to the trans
@@ -47,7 +49,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           "${element.date.year}-${element.date.month}-${element.date.day}";
       var amount = element.amount;
       transactions.add(
-        Transaction(icon: icon, category: category, date: date, amount: amount, isIncome: element.isIncome),
+        Transaction(id: element.id,icon: icon, category: category, date: date, amount: amount, isIncome: element.isIncome),
       );
     }
     return transactions;
@@ -134,52 +136,58 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final String amountString =
         '${transaction.isIncome ? '+' : '-'}\$${transaction.amount.abs().toStringAsFixed(2)}';
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F7),
-              borderRadius: BorderRadius.circular(10.0),
+    return GestureDetector(
+      onTap: () {
+        // Navigate to transaction details screen
+        Navigator.pushNamed(context, '/transdetails', arguments: service.getTransaction(transaction.id));
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F5F7),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Icon(
+                transaction.icon,
+                size: 24,
+                color: const Color(0xFF555555),
+              ),
             ),
-            child: Icon(
-              transaction.icon,
-              size: 24,
-              color: const Color(0xFF555555),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.category,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                    color: Color(0xFF333333),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    transaction.category,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Color(0xFF333333),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  transaction.date,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  Text(
+                    transaction.date,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            amountString,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: amountColor,
+            Text(
+              amountString,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: amountColor,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

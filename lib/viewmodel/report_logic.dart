@@ -40,10 +40,12 @@ class ReportLogic {
       if (trans.status != 'income') {
         continue; // Skip non-income transactions
       } else {
-        final monthName = trans.date.day.toString() + '/${trans.date.month}';
-        // Sum amounts per month
-        monthlyTotals[monthName] =
-            (monthlyTotals[monthName] ?? 0) + trans.amount;
+        if (DateTime.now().month == trans.date.month) {
+          final monthName = trans.date.day.toString() + '/${trans.date.month}';
+          // Sum amounts per month
+          monthlyTotals[monthName] =
+              (monthlyTotals[monthName] ?? 0) + trans.amount;
+        }
       }
     }
 
@@ -88,10 +90,12 @@ class ReportLogic {
       if (trans.status != 'expense') {
         continue; // Skip non-income transactions
       } else {
-        final monthName = trans.date.day.toString() + '/${trans.date.month}';
-        // Sum amounts per month
-        monthlyTotals[monthName] =
-            (monthlyTotals[monthName] ?? 0) + trans.amount;
+        if (DateTime.now().month == trans.date.month) {
+          final monthName = trans.date.day.toString() + '/${trans.date.month}';
+          // Sum amounts per month
+          monthlyTotals[monthName] =
+              (monthlyTotals[monthName] ?? 0) + trans.amount;
+        }
       }
     }
 
@@ -130,6 +134,38 @@ class ReportLogic {
     return {'monthNames': monthNames, 'monthlyExpenses': monthlySavings};
   }
 
+  Map<String, List<dynamic>> getAllSavingMonthbyDay() {
+    List<AddTransaction> allTrans = service.getAllTransactions();
+
+    // Map to store month -> total amount
+    Map<String, double> monthlyTotals = {};
+
+    for (var trans in allTrans) {
+      if (trans.status != 'income') {
+        continue; // Skip non-income transactions
+      } else {
+        if (trans.category != 'Insurance') {
+          if (DateTime.now().month == trans.date.month) {
+            final monthName =
+                trans.date.day.toString() + '/${trans.date.month}';
+            // Sum amounts
+            // Sum amounts per month
+            monthlyTotals[monthName] =
+                (monthlyTotals[monthName] ?? 0) + trans.amount;
+          }
+        } else {
+          continue;
+        }
+      }
+    }
+
+    // Separate lists for chart or UI
+    List<String> monthNames = monthlyTotals.keys.toList();
+    List<double> monthlySavings = monthlyTotals.values.toList();
+
+    return {'monthNames': monthNames, 'monthlyExpenses': monthlySavings};
+  }
+
   Map<String, List<dynamic>> getAllExpenseBrackdownMonthNames() {
     List<AddTransaction> allTrans = service.getAllTransactions();
 
@@ -144,6 +180,37 @@ class ReportLogic {
         // Sum amounts per category
         categoryTotals[categoryName] =
             (categoryTotals[categoryName] ?? 0) + trans.amount;
+      }
+    }
+
+    // Separate lists for chart or UI
+    List<String> categoryNames = categoryTotals.keys.toList();
+    List<double> categoryExpenses = categoryTotals.values.toList();
+    print("Category Names: $categoryNames");
+    print("Category Expenses: $categoryExpenses");
+
+    return {
+      'categoryNames': categoryNames,
+      'categoryExpenses': categoryExpenses,
+    };
+  }
+
+  Map<String, List<dynamic>> getAllExpenseBrackdownMonthWithday() {
+    List<AddTransaction> allTrans = service.getAllTransactions();
+
+    // Map to store category -> total amount
+    Map<String, double> categoryTotals = {};
+
+    for (var trans in allTrans) {
+      if (trans.status != 'expense') {
+        continue; // Skip non-expense transactions
+      } else {
+        if (DateTime.now().month == trans.date.month) {
+          final categoryName = trans.category;
+          // Sum amounts per category
+          categoryTotals[categoryName] =
+              (categoryTotals[categoryName] ?? 0) + trans.amount;
+        }
       }
     }
 

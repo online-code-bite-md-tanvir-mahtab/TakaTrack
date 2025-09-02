@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Transaction {
+  final String id;
   final IconData icon;
   final String category;
   final String date;
@@ -8,6 +9,7 @@ class Transaction {
   final bool isIncome;
 
   Transaction({
+    required this.id,
     required this.icon,
     required this.category,
     required this.date,
