@@ -363,6 +363,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           var amount = element.amount;
           transactions.add(
             Transaction(
+              id: element.id,
               icon: icon,
               category: category,
               date: date,

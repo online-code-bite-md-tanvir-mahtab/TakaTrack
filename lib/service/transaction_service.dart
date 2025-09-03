@@ -13,6 +13,10 @@ class TransactionService {
     return _transactionBox.values.toList();
   }
 
+  AddTransaction? getTransactionById(String id) {
+    return _transactionBox.get(id);
+  }
+
   Future<void> addTransaction(AddTransaction transaction) async {
     await _transactionBox.put(transaction.id, transaction);
   }

@@ -1,13 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:takatrack/model/add_transaction.dart';
+import 'package:takatrack/service/transaction_service.dart';
 
-class TransactionDetailsScreen extends StatelessWidget {
+class TransactionDetailsScreen extends StatefulWidget {
   const TransactionDetailsScreen({super.key});
 
   @override
+  State<TransactionDetailsScreen> createState() =>
+      _TransactionDetailsScreenState();
+}
+
+class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
+  late AddTransaction _transaction;
+  late double _amount;
+  late DateTime _date;
+  late String _description;
+  late String _category;
+  late String _note;
+  late String _status;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _transaction =
+        ModalRoute.of(context)!.settings.arguments as AddTransaction;
+    final service = TransactionService();
+    AddTransaction? trans = service.getTransactionById(_transaction.id);
+
+    if (trans != null) {
+      _amount = trans.amount;
+      _date = trans.date;
+      _description = trans.note;
+      _category = trans.category;
+      _note = trans.note;
+      _status = trans.status;
+
+    } else {
+      // Handle the case where transaction is not found,
+      // perhaps navigate back or show an error.
+      _amount = 0.0;
+      _date = "N/A" as DateTime;
+      _description = "N/A";
+      _category = "N/A";
+      _note = "N/A";
+      _status = "N/A";
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final transaction = ModalRoute.of(context)!.settings.arguments as AddTransaction;
-    
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -51,15 +92,15 @@ class TransactionDetailsScreen extends StatelessWidget {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
-                          'Dining Out',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                          _category,
+                          style: const TextStyle(fontSize: 16, color: Colors.grey),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
-                          '\$125.00',
-                          style: TextStyle(
+                          '\$${_amount.toStringAsFixed(2)}',
+                          style: const TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -86,28 +127,27 @@ class TransactionDetailsScreen extends StatelessWidget {
                       ],
                     ),
                     child: Column(
-                      children: const [
-                        _DetailRow(label: 'Amount', value: '\$125.00'),
-                        Divider(height: 24, thickness: 0.5),
+                      children: [
+                        _DetailRow(
+                            label: 'Amount', value: '\$${_amount.toStringAsFixed(2)}'),
+                        const Divider(height: 24, thickness: 0.5),
                         _DetailRow(
                           label: 'Date & Time',
-                          value: 'July 15, 2024, 7:30 PM',
+                          value:
+                              '${_date.month}/${_date.day}/${_date.year}, ${_date.hour}:${_date.minute}',
                         ),
-                        Divider(height: 24, thickness: 0.5),
-                        _DetailRow(
-                          label: 'Description',
-                          value: 'Dinner at The Bistro',
-                        ),
-                        Divider(height: 24, thickness: 0.5),
-                        _DetailRow(label: 'Account', value: 'Checking Account'),
+                        const Divider(height: 24, thickness: 0.5),
+                        _DetailRow(label: 'Description', value: _description.isEmpty ? 'N/A' : _description ),
+                        const Divider(height: 24, thickness: 0.5),
+                        _DetailRow(label: 'Status', value: _status),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // Spending Insights Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 0.0),
                     child: Text(
                       'Spending Insights',
                       style: TextStyle(
@@ -135,7 +175,7 @@ class TransactionDetailsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _InsightRow(
+                        const _InsightRow(
                           label: 'Average Spending',
                           subLabel: 'Last Month',
                           value: '\$110',
