@@ -28,6 +28,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   String? _selectedCategory;
   DateTime? _selectedDate;
 
+  late AddTransaction _transaction;
+  late double _amount;
+  late DateTime _date;
+  late String _description;
+  late String _category;
+  late String _note;
+  late String _status;
+
   Util util = Util();
   final service = TransactionService();
 
@@ -35,6 +43,57 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args != null && args is AddTransaction) {
+      _transaction = args;
+    } else {
+      // If no arguments are passed, initialize with default values
+      _transaction = AddTransaction(
+        id: '',
+        amount: 0.0,
+        category: '',
+        date: DateTime.now(),
+        note: '',
+        isIncome: false,
+        status: 'expense',
+      );
+    }
+    final service = TransactionService();
+    AddTransaction? trans = service.getTransactionById(_transaction.id);
+
+    if (trans != null) {
+      _amount = trans.amount;
+      _date = trans.date;
+      _description = trans.note;
+      _category = trans.category;
+      _note = trans.note;
+      _status = trans.status;
+
+      // Set input fields
+      _amountController.text = _amount.toString();
+      _dateController.text =
+          "${_date.year}-${_date.month.toString().padLeft(2, '0')}-${_date.day.toString().padLeft(2, '0')}";
+      _descriptionController.text = _description;
+      _selectedCategory = _category;
+      _selectedDate = _date;
+      _selectedType = _status == "income"
+          ? TransactionType.income
+          : TransactionType.expense;
+    } else {
+      // Handle the case where transaction is not found,
+      // perhaps navigate back or show an error.
+      _amount = 0.0;
+      _date = DateTime.now();
+      _description = "";
+      _category = "";
+      _note = "";
+      _status = "expense";
+    }
   }
 
   @override
@@ -337,20 +396,42 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       onPressed: () {
         // Handle save action
         setState(() {
-          service.addTransaction(
-            AddTransaction(
-              amount: double.parse(_amountController.text),
-              category: _selectedCategory.toString(),
-              date: DateTime(
-                int.parse(_dateController.text.split("-")[0]),
-                int.parse(_dateController.text.split("-")[1]),
-                int.parse(_dateController.text.split("-")[2]),
+          if (_transaction.id.isEmpty) {
+            service.addTransaction(
+              AddTransaction(
+                amount: double.parse(_amountController.text),
+                category: _selectedCategory.toString(),
+                date: DateTime(
+                  int.parse(_dateController.text.split("-")[0]),
+                  int.parse(_dateController.text.split("-")[1]),
+                  int.parse(_dateController.text.split("-")[2]),
+                ),
+                note: _descriptionController.text,
+                isIncome: _selectedType == TransactionType.income
+                    ? true
+                    : false,
+                status: _selectedType.name,
               ),
-              note: _descriptionController.text,
-              isIncome: _selectedType == TransactionType.income ? true : false,
-              status: _selectedType.name,
-            ),
-          );
+            );
+          } else {
+            service.updateTransaction(
+              AddTransaction(
+                id: _transaction.id,
+                amount: double.parse(_amountController.text),
+                category: _selectedCategory.toString(),
+                date: DateTime(
+                  int.parse(_dateController.text.split("-")[0]),
+                  int.parse(_dateController.text.split("-")[1]),
+                  int.parse(_dateController.text.split("-")[2]),
+                ),
+                note: _descriptionController.text,
+                isIncome: _selectedType == TransactionType.income
+                    ? true
+                    : false,
+                status: _selectedType.name,
+              ),
+            );
+          }
         });
         List<AddTransaction> trans = service.getAllTransactions();
         List<Transaction> transactions = [];

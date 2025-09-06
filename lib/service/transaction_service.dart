@@ -10,7 +10,9 @@ class TransactionService {
   // insert
 
   List<AddTransaction> getAllTransactions() {
-    return _transactionBox.values.toList();
+    final transactions = _transactionBox.values.toList();
+    transactions.sort((a, b) => b.date.compareTo(a.date));
+    return transactions;
   }
 
   AddTransaction? getTransactionById(String id) {
@@ -22,6 +24,13 @@ class TransactionService {
   }
 
   Future<void> deleteTransaction(String id) async {
+    final transaction = _transactionBox.get(id);
+    if (transaction != null) {
+      // This code only updates the transaction status before deleting.
+      // It does NOT affect any bank balance directly.
+      transaction.status = 'income'; // or whatever status you want
+      await _transactionBox.put(id, transaction);
+    }
     await _transactionBox.delete(id);
   }
 

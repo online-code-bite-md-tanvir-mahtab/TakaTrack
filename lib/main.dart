@@ -10,15 +10,20 @@ import 'package:takatrack/screen/main_screen.dart';
 import 'package:takatrack/screen/reports_screen.dart';
 import 'package:takatrack/screen/savings_goal_screen.dart';
 import 'package:takatrack/model/add_transaction.dart';
+import 'package:takatrack/screen/splash/takatrackapp.dart';
 import 'package:takatrack/screen/transaction_detail_screen.dart';
 import 'package:takatrack/screen/transaction_screen.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize Hive and register adapters if necessary
   await Hive.initFlutter(); // Uncomment if using Hive for local storage
-  Hive.registerAdapter(AddTransactionAdapter()); // Register your Hive adapters here
-  await Hive.openBox<AddTransaction>('transactions'); // Open a box for transactions
+  Hive.registerAdapter(
+    AddTransactionAdapter(),
+  ); // Register your Hive adapters here
+  await Hive.openBox<AddTransaction>(
+    'transactions',
+  ); // Open a box for transactions
   Hive.registerAdapter(AddGoalAdapter());
   await Hive.openBox<AddGoal>('goals');
   runApp(const MainApp());
@@ -29,14 +34,19 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if the transactions box has any data
+    final transactionsBox = Hive.box<AddTransaction>('transactions');
+    final hasData = transactionsBox.isNotEmpty;
+
     return MaterialApp(
       title: 'TakaTrack',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: const Color(0xFFF8F9FA),
       ),
-      initialRoute: '/',
+      initialRoute: hasData ? '/' : '/splash',
       routes: {
+        '/splash': (context) => const OnboardingScreen(),
         '/': (context) => const MainScreen(),
         '/dashboard': (context) => const DashboardScreen(),
         '/addTransaction': (context) => const AddTransactionScreen(),

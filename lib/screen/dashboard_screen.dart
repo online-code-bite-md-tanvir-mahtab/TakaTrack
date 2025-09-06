@@ -204,19 +204,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   List<BarChartGroupData> chartData() {
     final data = _logic.getIncomeExpensesBarChartData();
-    final incomes = data['Income']  ?? [];
-    final expenses = data['Expenses']  ?? [];
+    final incomes = data['Income'] ?? [];
+    final expenses = data['Expenses'] ?? [];
 
     List<BarChartGroupData> groups = [];
     int length = incomes.length + expenses.length;
-print(length);
+    print(length);
     for (int i = 0; i < length; i++) {
       double income = i < incomes.length ? incomes[i] : 0;
       double expense = i < expenses.length ? expenses[i] : 0;
       // You can visualize both income and expense as two bars per group if needed.
-      groups.add(
-        makeGroupData(i, income - expense),
-      );
+      groups.add(makeGroupData(i, income - expense));
     }
     return groups;
   }
@@ -287,7 +285,6 @@ print(length);
 
     if (days.isEmpty) {
       text = '';
-      
     } else {
       text = days[value.toInt() % days.length].toString();
     }

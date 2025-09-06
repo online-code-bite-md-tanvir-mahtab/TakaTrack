@@ -12,6 +12,7 @@ class TransactionDetailsScreen extends StatefulWidget {
 
 class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   late AddTransaction _transaction;
+  final service = TransactionService();
   late double _amount;
   late DateTime _date;
   late String _description;
@@ -22,8 +23,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _transaction =
-        ModalRoute.of(context)!.settings.arguments as AddTransaction;
+    _transaction = ModalRoute.of(context)!.settings.arguments as AddTransaction;
     final service = TransactionService();
     AddTransaction? trans = service.getTransactionById(_transaction.id);
 
@@ -34,7 +34,6 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       _category = trans.category;
       _note = trans.note;
       _status = trans.status;
-
     } else {
       // Handle the case where transaction is not found,
       // perhaps navigate back or show an error.
@@ -95,7 +94,10 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                       children: [
                         Text(
                           _category,
-                          style: const TextStyle(fontSize: 16, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -129,7 +131,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                     child: Column(
                       children: [
                         _DetailRow(
-                            label: 'Amount', value: '\$${_amount.toStringAsFixed(2)}'),
+                          label: 'Amount',
+                          value: '\$${_amount.toStringAsFixed(2)}',
+                        ),
                         const Divider(height: 24, thickness: 0.5),
                         _DetailRow(
                           label: 'Date & Time',
@@ -137,7 +141,10 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                               '${_date.month}/${_date.day}/${_date.year}, ${_date.hour}:${_date.minute}',
                         ),
                         const Divider(height: 24, thickness: 0.5),
-                        _DetailRow(label: 'Description', value: _description.isEmpty ? 'N/A' : _description ),
+                        _DetailRow(
+                          label: 'Description',
+                          value: _description.isEmpty ? 'N/A' : _description,
+                        ),
                         const Divider(height: 24, thickness: 0.5),
                         _DetailRow(label: 'Status', value: _status),
                       ],
@@ -237,6 +244,11 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                   child: OutlinedButton(
                     onPressed: () {
                       // Handle Edit button
+                      Navigator.pushNamed(
+                        context,
+                        '/addTransaction',
+                        arguments: _transaction,
+                      );
                     },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -254,8 +266,10 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       // Handle Delete button
+                      await service.deleteTransaction(_transaction.id);
+                      Navigator.pop(context); // Go back after deletion
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
@@ -292,13 +306,22 @@ class _DetailRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 16, color: Colors.black),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 16, color: Colors.black),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, color: Colors.black),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 16, color: Colors.black),
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.visible,
+              softWrap: true,
+            ),
           ),
         ],
       ),
